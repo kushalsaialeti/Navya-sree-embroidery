@@ -1,14 +1,12 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   /* 1. Ignore TypeScript Errors (Still supported) */
-  typescript: {
+  eslint: {
     ignoreBuildErrors: true,
   },
 
   /* 2. ESLint block REMOVED (Handled in Step 2) */
 
-  /* 3. Allow images from external sources */
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
@@ -27,6 +25,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ['lucide-react'],
 };
 
-export default nextConfig;
+module.exports = nextConfig;
