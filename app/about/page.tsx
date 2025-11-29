@@ -10,7 +10,7 @@ export default function AboutPage() {
             {/* Hero Section */}
             <section className="relative h-[60vh] w-full overflow-hidden flex items-center justify-center">
                 <div className="absolute inset-0 z-0">
-                    <div className="h-full w-full bg-[url('https://placehold.co/1920x1080/047857/FFFFFF?text=Our+Story')] bg-cover bg-center opacity-30 dark:opacity-20" />
+                    {/* <div className="h-full w-full bg-[url('https://placehold.co/1920x1080/047857/FFFFFF?text=Our+Story')] bg-cover bg-center opacity-30 dark:opacity-20" /> */}
                 </div>
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto space-y-6">
                     <h1 className="font-serif text-5xl md:text-6xl font-bold text-foreground">

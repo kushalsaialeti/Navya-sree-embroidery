@@ -14,7 +14,8 @@ export default function DesignDetailsPage() {
     const router = useRouter();
     const { addToCart } = useCart();
 
-    const product = products.find((p) => p.id === params.id);
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+    const product = products.find((p) => p.id === id);
 
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState("M");
@@ -109,8 +110,8 @@ export default function DesignDetailsPage() {
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
                                             className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium transition-all ${selectedSize === size
-                                                    ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary ring-offset-2"
-                                                    : "bg-background border border-border text-foreground hover:border-primary"
+                                                ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary ring-offset-2"
+                                                : "bg-background border border-border text-foreground hover:border-primary"
                                                 }`}
                                         >
                                             {size}

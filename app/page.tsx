@@ -15,7 +15,7 @@ export default function Home() {
       <section className="relative h-[80vh] w-full overflow-hidden bg-secondary/20">
         <div className="absolute inset-0 z-0">
           {/* Placeholder for Hero Image - using a gradient/pattern for now if no image */}
-          <div className="h-full w-full bg-[url('https://placehold.co/1920x1080/EADCF2/6B4570?text=Exquisite+Ethnic+Wear')] bg-cover bg-center opacity-50 dark:opacity-20" />
+          {/* <div className="h-full w-full bg-[url('https://placehold.co/1920x1080/EADCF2/6B4570?text=Exquisite+Ethnic+Wear')] bg-cover bg-center opacity-50 dark:opacity-20" /> */}
         </div>
 
         <div className="relative z-10 container mx-auto flex h-full flex-col justify-center px-4 sm:px-6 lg:px-8">
