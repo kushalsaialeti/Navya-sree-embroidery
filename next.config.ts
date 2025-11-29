@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
 
   /* 3. Allow images from external sources */
   images: {
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
