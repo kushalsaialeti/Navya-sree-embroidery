@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import DesignCard from "@/components/features/DesignCard";
 import { products, categories } from "@/lib/mockData";
 
-export default function CataloguePage() {
+function CatalogueContent() {
     const searchParams = useSearchParams();
     const initialCategory = searchParams.get("category") || "all";
     const [activeCategory, setActiveCategory] = useState(initialCategory);
@@ -42,8 +42,8 @@ export default function CataloguePage() {
                                         key={cat.name}
                                         onClick={() => setActiveCategory(cat.value)}
                                         className={`w-full text-left px-4 py-2 rounded-md transition-colors ${activeCategory === cat.value
-                                                ? "bg-primary text-primary-foreground font-medium"
-                                                : "text-muted-foreground hover:bg-secondary/20 hover:text-foreground"
+                                            ? "bg-primary text-primary-foreground font-medium"
+                                            : "text-muted-foreground hover:bg-secondary/20 hover:text-foreground"
                                             }`}
                                     >
                                         {cat.name}
@@ -99,5 +99,13 @@ export default function CataloguePage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function CataloguePage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <CatalogueContent />
+        </Suspense>
     );
 }
