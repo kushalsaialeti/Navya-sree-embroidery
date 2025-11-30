@@ -2,12 +2,16 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShoppingBag, User, Menu, X } from "lucide-react";
 import { NAV_LINKS, APP_NAME } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 
 const Navbar = () => {
+    const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    if (pathname?.startsWith("/admin")) return null;
 
     return (
         <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
