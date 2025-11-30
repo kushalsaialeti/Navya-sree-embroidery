@@ -4,10 +4,22 @@ import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import DesignCard from "@/components/features/DesignCard";
-import { products } from "@/lib/mockData";
+import { getAllProducts } from "@/backend/controllers/productController";
 
-export default function Home() {
-  const featuredProducts = products.slice(0, 3);
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const allProducts = await getAllProducts();
+  const featuredProducts = allProducts.slice(0, 3).map((p) => ({
+    id: p._id.toString(),
+    title: p.title,
+    category: p.category,
+    price: p.price,
+    image: p.images[0] || "https://placehold.co/600x800",
+    description: p.description,
+    material: "Premium Silk", // Default
+    rating: 4.8, // Default
+  }));
 
   return (
     <div className="space-y-16 pb-16">

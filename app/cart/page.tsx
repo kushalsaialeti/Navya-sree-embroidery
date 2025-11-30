@@ -124,7 +124,73 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            <Button size="lg" className="w-full mt-8 text-base">
+                            {/* Checkout Form */}
+                            <div className="mt-8 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Name</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Your Name"
+                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                        id="customerName"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        placeholder="Your Phone Number"
+                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                        id="contactNumber"
+                                    />
+                                </div>
+                            </div>
+
+                            <Button
+                                size="lg"
+                                className="w-full mt-6 text-base"
+                                onClick={async () => {
+                                    const nameInput = document.getElementById("customerName") as HTMLInputElement;
+                                    const phoneInput = document.getElementById("contactNumber") as HTMLInputElement;
+                                    const name = nameInput.value;
+                                    const phone = phoneInput.value;
+
+                                    if (!name || !phone) {
+                                        alert("Please enter your name and phone number.");
+                                        return;
+                                    }
+
+                                    try {
+                                        const res = await fetch("/api/orders", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                customerName: name,
+                                                contactNumber: phone,
+                                                items: cart.map(item => ({
+                                                    productId: item.id,
+                                                    title: item.title,
+                                                    quantity: item.quantity,
+                                                    price: item.price,
+                                                    size: item.selectedSize
+                                                })),
+                                                totalAmount: cartTotal
+                                            }),
+                                        });
+
+                                        if (res.ok) {
+                                            alert("Order placed successfully! We will contact you shortly.");
+                                            // clearCart(); // Need to expose clearCart from context if not already
+                                            window.location.href = "/";
+                                        } else {
+                                            alert("Failed to place order. Please try again.");
+                                        }
+                                    } catch (error) {
+                                        console.error("Order error:", error);
+                                        alert("An error occurred. Please try again.");
+                                    }
+                                }}
+                            >
                                 Send Order Request <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
 

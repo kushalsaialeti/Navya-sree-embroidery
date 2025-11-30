@@ -2,6 +2,8 @@
 
 A premium Next.js application for showcasing and selling exquisite ethnic wear and handcrafted embroidery. This project features a modern, responsive design with a focus on visual storytelling and user experience.
 
+**[View Live Demo](https://navya-sree-embroidery.vercel.app/)**
+
 ## Features
 
 -   **Product Catalogue**: Explore a wide range of Blouses, Sarees, and intricate Maggam Work.

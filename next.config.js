@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* 1. Ignore TypeScript Errors (Still supported) */
-  eslint: {
-    ignoreBuildErrors: true,
-  },
 
   /* 2. ESLint block REMOVED (Handled in Step 2) */
 

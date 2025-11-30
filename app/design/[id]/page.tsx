@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import { Star, Minus, Plus, ShoppingBag, ArrowLeft, Heart } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { products } from "@/lib/mockData";
 import { useCart } from "@/context/CartContext";
 
 export default function DesignDetailsPage() {
@@ -15,11 +14,49 @@ export default function DesignDetailsPage() {
     const { addToCart } = useCart();
 
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
-    const product = products.find((p) => p.id === id);
+    // const product = products.find((p) => p.id === id); // Removed mock data lookup
+
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState("M");
     const [note, setNote] = useState("");
+
+    React.useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const res = await fetch(`/api/products/${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Transform data to match UI expectations
+                    setProduct({
+                        ...data,
+                        id: data._id,
+                        image: data.images ? data.images[0] : "",
+                        rating: 4.8, // Default
+                        material: "Premium Silk", // Default
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch product", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchProduct();
+        }
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
     if (!product) {
         return (
