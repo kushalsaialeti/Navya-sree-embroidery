@@ -38,9 +38,6 @@ const Navbar = () => {
 
                 {/* Icons */}
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm" className="hidden sm:flex">
-                        <User className="h-5 w-5" />
-                    </Button>
                     <Link href="/cart">
                         <Button variant="ghost" size="sm" className="relative">
                             <ShoppingBag className="h-5 w-5" />
@@ -74,15 +71,6 @@ const Navbar = () => {
                                 {link.name}
                             </Link>
                         ))}
-                        <div className="pt-4 border-t mt-2">
-                            <Link
-                                href="/profile"
-                                className="flex items-center gap-2 py-2 text-base font-medium text-foreground/80 hover:text-primary"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <User className="h-5 w-5" /> Profile
-                            </Link>
-                        </div>
                     </div>
                 </div>
             )}

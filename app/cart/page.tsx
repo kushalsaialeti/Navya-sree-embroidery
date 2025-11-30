@@ -1,14 +1,81 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Trash2, ArrowRight, ShoppingBag } from "lucide-react";
+import { Trash2, ArrowRight, ShoppingBag, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
+import OrderSuccess from "@/components/checkout/OrderSuccess";
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity, cartTotal } = useCart();
+    const { cart, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart();
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        phone: "",
+    });
+    const [error, setError] = useState("");
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setError(""); // Clear error on typing
+    };
+
+    const handleSubmit = async () => {
+        // Validation
+        if (!formData.name.trim() || !formData.phone.trim()) {
+            setError("Please enter both your Name and Phone Number.");
+            return;
+        }
+
+        if (formData.phone.trim().length < 10) {
+            setError("Please enter a valid 10-digit phone number.");
+            return;
+        }
+
+        setIsLoading(true);
+        setError("");
+
+        try {
+            const res = await fetch("/api/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    customerName: formData.name,
+                    contactNumber: formData.phone,
+                    items: cart.map(item => ({
+                        productId: item.id,
+                        title: item.title,
+                        quantity: item.quantity,
+                        price: item.price,
+                        size: item.selectedSize
+                    })),
+                    totalAmount: cartTotal
+                }),
+            });
+
+            if (res.ok) {
+                clearCart();
+                setIsSuccess(true);
+                window.scrollTo(0, 0);
+            } else {
+                const data = await res.json();
+                setError(data.error || "Failed to place order. Please try again.");
+            }
+        } catch (err) {
+            console.error("Order error:", err);
+            setError("An error occurred. Please check your connection and try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isSuccess) {
+        return <OrderSuccess />;
+    }
 
     if (cart.length === 0) {
         return (
@@ -99,7 +166,7 @@ export default function CartPage() {
                         ))}
                     </div>
 
-                    {/* Order Summary */}
+                    {/* Order Summary & Checkout Form */}
                     <div className="lg:col-span-1">
                         <div className="rounded-xl border border-border bg-card p-6 shadow-sm sticky top-24">
                             <h2 className="font-serif text-xl font-semibold text-foreground mb-6">Order Summary</h2>
@@ -124,78 +191,64 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            {/* Checkout Form */}
+                            {/* Guest Checkout Form */}
                             <div className="mt-8 space-y-4">
+                                <div className="bg-primary/5 p-4 rounded-lg border border-primary/10 mb-4">
+                                    <h3 className="font-medium text-primary mb-2 text-sm">Guest Checkout</h3>
+                                    <p className="text-xs text-muted-foreground">
+                                        Enter your details below. We will contact you to confirm the order.
+                                    </p>
+                                </div>
+
                                 <div>
-                                    <label className="block text-sm font-medium text-foreground mb-1">Name</label>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Full Name <span className="text-red-500">*</span></label>
                                     <input
                                         type="text"
-                                        placeholder="Your Name"
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                                        id="customerName"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. Priya Sharma"
+                                        className={`w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${error && !formData.name ? 'border-red-500' : 'border-input'}`}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-foreground mb-1">Phone Number</label>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Phone Number <span className="text-red-500">*</span></label>
                                     <input
                                         type="tel"
-                                        placeholder="Your Phone Number"
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                                        id="contactNumber"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. 9876543210"
+                                        className={`w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${error && (!formData.phone || formData.phone.length < 10) ? 'border-red-500' : 'border-input'}`}
                                     />
                                 </div>
                             </div>
 
+                            {error && (
+                                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
+                                    {error}
+                                </div>
+                            )}
+
                             <Button
                                 size="lg"
-                                className="w-full mt-6 text-base"
-                                onClick={async () => {
-                                    const nameInput = document.getElementById("customerName") as HTMLInputElement;
-                                    const phoneInput = document.getElementById("contactNumber") as HTMLInputElement;
-                                    const name = nameInput.value;
-                                    const phone = phoneInput.value;
-
-                                    if (!name || !phone) {
-                                        alert("Please enter your name and phone number.");
-                                        return;
-                                    }
-
-                                    try {
-                                        const res = await fetch("/api/orders", {
-                                            method: "POST",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify({
-                                                customerName: name,
-                                                contactNumber: phone,
-                                                items: cart.map(item => ({
-                                                    productId: item.id,
-                                                    title: item.title,
-                                                    quantity: item.quantity,
-                                                    price: item.price,
-                                                    size: item.selectedSize
-                                                })),
-                                                totalAmount: cartTotal
-                                            }),
-                                        });
-
-                                        if (res.ok) {
-                                            alert("Order placed successfully! We will contact you shortly.");
-                                            // clearCart(); // Need to expose clearCart from context if not already
-                                            window.location.href = "/";
-                                        } else {
-                                            alert("Failed to place order. Please try again.");
-                                        }
-                                    } catch (error) {
-                                        console.error("Order error:", error);
-                                        alert("An error occurred. Please try again.");
-                                    }
-                                }}
+                                className="w-full mt-6 text-base bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 transition-all duration-300"
+                                onClick={handleSubmit}
+                                disabled={isLoading}
                             >
-                                Send Order Request <ArrowRight className="ml-2 h-4 w-4" />
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...
+                                    </>
+                                ) : (
+                                    <>
+                                        Send Order Request <ArrowRight className="ml-2 h-4 w-4" />
+                                    </>
+                                )}
                             </Button>
 
                             <p className="mt-4 text-xs text-center text-muted-foreground">
-                                This will send a request to our team via WhatsApp/Email for confirmation.
+                                By clicking send, you agree to be contacted regarding this order.
                             </p>
                         </div>
                     </div>
